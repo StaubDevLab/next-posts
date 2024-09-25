@@ -2,7 +2,9 @@
 
 import { z } from 'zod'
 import {redirect} from "next/navigation";
-
+import { S3 } from '@aws-sdk/client-s3';
+import {deletePost, storePost} from "@/lib/posts";
+const s3 = new S3({ region: 'eu-west-3' });
 const PostSchema = z.object({
     title: z.string().min(1, 'Le titre est requis').max(100, 'Le titre ne peut pas dépasser 100 caractères'),
     content: z.string().min(10, 'Le contenu doit avoir au moins 10 caractères'),
@@ -21,6 +23,7 @@ export type ActionState = {
 }
 
 export async function createPost(prevState: ActionState, formData: FormData): Promise<ActionState> {
+
     const validatedFields = PostSchema.safeParse({
         title: formData.get('title'),
         content: formData.get('content'),
@@ -33,9 +36,32 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
             message: 'Échec de la validation. Veuillez corriger les erreurs.',
         }
     }
+    const {title, content,image} = validatedFields.data
+    const extension = image.name.split(".").pop()
+    const fileName = `${title}.${extension}`
+
+    const bufferedImage = await image.arrayBuffer()
+
+    s3.putObject({
+        Bucket: 'next-foodies',
+        Key: `images/${fileName}`,
+        Body: Buffer.from(bufferedImage),
+        ContentType: image.type,
+    });
+    await storePost({
+        title: title,
+        content: content,
+        imageUrl:`/images/${fileName}`,
+        userId:1
+    })
 
     redirect('/')
     return {
         message: 'Post créé avec succès !',
     }
+}
+
+export async function deletePostAction(postID : string): Promise<ActionState> {
+    await deletePost(postID)
+    redirect('/')
 }

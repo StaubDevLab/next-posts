@@ -1,12 +1,13 @@
 import { formatDate } from '@/lib/format';
 import LikeButton from './like-icon';
 import {PostType} from "@/@types/Post";
+import DeletePostBtn from "@/components/delete-post-btn";
 
 function Post({ post } : {post: PostType}) {
   return (
     <article className="post">
       <div className="post-image">
-        <img src={post.image} alt={post.title} />
+        <img src={`https://next-foodies.s3.eu-west-3.amazonaws.com${post.image}`} alt={post.title} />
       </div>
       <div className="post-content">
         <header>
@@ -25,6 +26,7 @@ function Post({ post } : {post: PostType}) {
         </header>
         <p>{post.content}</p>
       </div>
+      <DeletePostBtn postId={post.id}/>
     </article>
   );
 }
