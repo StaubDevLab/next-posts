@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import {redirect} from "next/navigation";
 import { S3 } from '@aws-sdk/client-s3';
-import {deletePost, getPost, storePost, updatePostLikeStatus} from "@/lib/posts";
+import { getPost, storePost, deletePost} from "@/lib/posts";
 import {revalidatePath} from "next/cache";
 const s3 = new S3({ region: 'eu-west-3' });
 const PostSchema = z.object({
@@ -62,6 +62,7 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
     }
 }
 
+
 export async function deletePostAction(postID : string): Promise<ActionState> {
     const post = await getPost(postID)
     await deletePost(postID)
@@ -74,9 +75,9 @@ export async function deletePostAction(postID : string): Promise<ActionState> {
     revalidatePath('/', 'layout')
     redirect('/')
 }
-
+/*
 export async function togglePostLikesStatus(postID : string): Promise<any> {
    await updatePostLikeStatus(postID,2)
     revalidatePath('/', 'layout')
     return redirect('/')
-}
+}*/

@@ -1,10 +1,11 @@
 export type PostType = {
     id: string;
     title: string;
-    image: string;
-    createdAt: string;
+    imageUrl: string;
+    createdat: string;
     content: string;
-    userFirstName: string;
+    userId: number;
     isLiked: boolean;
     likes: number;
+
 }

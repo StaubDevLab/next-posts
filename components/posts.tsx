@@ -7,6 +7,7 @@ import DeletePostBtn from "@/components/delete-post-btn";
 import {togglePostLikesStatus} from "@/actions/submitPost";
 
 function Post({post, action}: { post: PostType, action: (postId: string) => Promise<void> }) {
+    console.log(post);
     return (
         <article className="post">
             <div className="post-image">
@@ -18,8 +19,8 @@ function Post({post, action}: { post: PostType, action: (postId: string) => Prom
                         <h2>{post.title}</h2>
                         <p>
                             Shared by {post.userFirstName} on{' '}
-                            <time dateTime={post.createdAt}>
-                                {formatDate(post.createdAt)}
+                            <time dateTime={post.createdat}>
+                                {formatDate(post.createdat)}
                             </time>
                         </p>
                     </div>
