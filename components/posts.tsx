@@ -10,7 +10,7 @@ function Post({post, action}: { post: PostType, action: (postId: string) => Prom
     return (
         <article className="post">
             <div className="post-image">
-                <img src={`https://next-foodies.s3.eu-west-3.amazonaws.com${post.image}`} alt={post.title}/>
+                <img src={`https://next-foodies.s3.eu-west-3.amazonaws.com/${post.image}`} alt={post.title}/>
             </div>
             <div className="post-content">
                 <header>

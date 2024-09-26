@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import {redirect} from "next/navigation";
 import { S3 } from '@aws-sdk/client-s3';
-import {deletePost, storePost, updatePostLikeStatus} from "@/lib/posts";
+import {deletePost, getPost, storePost, updatePostLikeStatus} from "@/lib/posts";
 import {revalidatePath} from "next/cache";
 const s3 = new S3({ region: 'eu-west-3' });
 const PostSchema = z.object({
@@ -43,7 +43,7 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
 
     const bufferedImage = await image.arrayBuffer()
 
-    s3.putObject({
+    await s3.putObject({
         Bucket: 'next-foodies',
         Key: `images/${fileName}`,
         Body: Buffer.from(bufferedImage),
@@ -52,10 +52,10 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
     await storePost({
         title: title,
         content: content,
-        imageUrl:`/images/${fileName}`,
+        imageUrl:`images/${fileName}`,
         userId:1
     })
-
+    revalidatePath('/', 'layout')
     redirect('/')
     return {
         message: 'Post créé avec succès !',
@@ -63,7 +63,15 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
 }
 
 export async function deletePostAction(postID : string): Promise<ActionState> {
+    const post = await getPost(postID)
     await deletePost(postID)
+    console.log(post)
+    await s3.deleteObject({
+        Bucket: 'next-foodies',
+        Key: 'images/Test04.jpg',
+    })
+
+    revalidatePath('/', 'layout')
     redirect('/')
 }
 
