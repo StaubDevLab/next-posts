@@ -3,7 +3,8 @@
 import { z } from 'zod'
 import {redirect} from "next/navigation";
 import { S3 } from '@aws-sdk/client-s3';
-import {deletePost, storePost} from "@/lib/posts";
+import {deletePost, storePost, updatePostLikeStatus} from "@/lib/posts";
+import {revalidatePath} from "next/cache";
 const s3 = new S3({ region: 'eu-west-3' });
 const PostSchema = z.object({
     title: z.string().min(1, 'Le titre est requis').max(100, 'Le titre ne peut pas dépasser 100 caractères'),
@@ -64,4 +65,10 @@ export async function createPost(prevState: ActionState, formData: FormData): Pr
 export async function deletePostAction(postID : string): Promise<ActionState> {
     await deletePost(postID)
     redirect('/')
+}
+
+export async function togglePostLikesStatus(postID : string): Promise<any> {
+   await updatePostLikeStatus(postID,2)
+    revalidatePath('/', 'layout')
+    return redirect('/')
 }
